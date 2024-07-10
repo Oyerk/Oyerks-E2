@@ -1,0 +1,145 @@
+@name Prop Manip
+@outputs P:entity Target:entity Sel Mode #outputs are for debug, ignore if using normally
+@persist Sel I Devisor Scale Mode AngDevisor
+interval(100)
+# Made by Oyerk
+#---------------CONTROLS---------------#
+#using the hands SWEP, press M1 to 
+#select a prop, and use the arrow
+#keys to selects the axis. Press M2
+#to move the prop along the axis
+#relative to your cursor. You'll have
+#to press M2 every time you move it 
+#on a multiplayer server due to E2
+#limitations, theres not much i can do.
+#Press R to change manipulation modes.
+#in rotation mode, press M2 to rotate
+#the prop on the selcted axis.
+#--------------------------------------#
+if(first()){
+    #--CONFIG--#
+    AngDevisor=1
+    Devisor=0.5
+    Scale=1
+    #--END CONFIG--#
+    Sel=1
+    I=1
+    Mode=0
+}
+P=owner():aimEntity()
+Players=players()
+event keyPressed(Player:entity, Key:string, Down:number, KeyBind:string) {
+    if(P:isValid() & Player==owner() & Key=="mouse_left" & owner():weapon():type()=="none"){
+        Target=P
+        timer("holo", 100)
+        I=1
+        Target:setPos(vec((round(Target:pos():x()/Devisor))*Devisor,(round(Target:pos():y()/Devisor))*Devisor,(round(Target:pos():z()/Devisor))*Devisor))
+        Target:setAng(ang((round(Target:angles():pitch()/AngDevisor))*AngDevisor,(round(Target:angles():yaw()/AngDevisor))*AngDevisor,(round(Target:angles():roll()/AngDevisor))*AngDevisor))
+    }elseif(P:isValid()==0 & Player==owner() & Key=="mouse_left" & owner():weapon():type()=="none"){
+        Target=noentity()
+        I=1
+        holoDeleteAll()
+    }
+    if(Down & Player==owner()){
+        if(Key=="up" | Key=="right"){
+            Sel++
+        }elseif(Key=="down" | Key=="left"){
+            Sel--
+        }
+        if(Key=="r"){
+            if(Mode==0){
+                Mode=1
+            }else{
+                Mode=0
+            }
+        }
+    }
+    if(Sel>3){
+        Sel=1
+    }elseif(Sel<1){
+        Sel=3 
+    }
+
+    if(Mode==0){
+    if(Sel==1 & Player==owner() & Key=="mouse_right" & owner():weapon():type()=="none" & P==Target){
+        Target:setPos(vec(Target:pos():x(),(round(owner():aimPos():y()/Devisor))*Devisor,Target:pos():z()))
+    }
+    if(Sel==2 & Player==owner() & Key=="mouse_right" & owner():weapon():type()=="none" & P==Target){
+        Target:setPos(vec((round(owner():aimPos():x()/Devisor))*Devisor,Target:pos():y(),Target:pos():z()))
+    }
+    if(Sel==3 & Player==owner() & Key=="mouse_right" & owner():weapon():type()=="none" & P==Target){
+        Target:setPos(vec(Target:pos():x(),Target:pos():y(),(round(owner():aimPos():z()/Devisor))*Devisor))
+    }
+    }else{
+    if(Sel==1 & Player==owner() & Key=="mouse_right" & owner():weapon():type()=="none" & P==Target){
+        Target:setAng(ang(Target:angles():pitch(),(round(owner():eyeAngles():yaw()/AngDevisor))*AngDevisor,Target:angles():roll()))
+    }
+    if(Sel==2 & Player==owner() & Key=="mouse_right" & owner():weapon():type()=="none" & P==Target){
+        Target:setAng(ang((round(owner():eyeAngles():pitch()/AngDevisor))*AngDevisor,Target:angles():yaw(),Target:angles():roll()))
+    }
+    if(Sel==3 & Player==owner() & Key=="mouse_right" & owner():weapon():type()=="none" & P==Target){
+        Target:setAng(ang(Target:angles():pitch(),Target:angles():yaw(),(round(owner():eyeAngles():yaw()/AngDevisor))*AngDevisor))    
+    }
+    }
+}
+if(Target:isValid()){
+holoCreate(1, Target:massCenter(), vec(0.1,0.1,0.1)*vec(Scale,Scale,Scale), ang(0,0,0), vec(255,255,255), "models/hunter/misc/sphere1x1.mdl")
+if(Mode==0){
+if(Sel==1){
+    holoCreate(2, Target:massCenter()-vec(0,12*Scale,0), vec(0.4,0.6,0.3)*vec(Scale,Scale,Scale), ang(0,0,0), vec(0,255,0), "models/hunter/plates/plate1.mdl")
+}else{
+    holoCreate(2, Target:massCenter()-vec(0,12*Scale,0), vec(0.3,0.5,0.3)*vec(Scale,Scale,Scale), ang(0,0,0), vec(0,120,0), "models/hunter/plates/plate1.mdl")
+}
+
+if(Sel==2){
+    holoCreate(3, Target:massCenter()+vec(12*Scale,0,0), vec(0.4,0.6,0.3)*vec(Scale,Scale,Scale), ang(0,-90,0), vec(255,0,0), "models/hunter/plates/plate1.mdl")
+}else{
+    holoCreate(3, Target:massCenter()+vec(12*Scale,0,0), vec(0.3,0.5,0.3)*vec(Scale,Scale,Scale), ang(0,-90,0), vec(120,0,0), "models/hunter/plates/plate1.mdl")
+}
+
+if(Sel==3){
+    holoCreate(4, Target:massCenter()+vec(0,0,12*Scale), vec(0.4,0.6,0.4)*vec(Scale,Scale,Scale), ang(0,0,-90), vec(0,0,255), "models/hunter/plates/plate1.mdl")
+}else{
+    holoCreate(4, Target:massCenter()+vec(0,0,12*Scale), vec(0.3,0.5,0.3)*vec(Scale,Scale,Scale), ang(0,0,-90), vec(0,0,120), "models/hunter/plates/plate1.mdl")
+}
+}else{
+if(Sel==1){
+    holoCreate(2, Target:massCenter(), vec(0.3,0.3,0.1)*vec(Scale,Scale,Scale), ang(0,0,0), vec(0,0,255), "models/hunter/tubes/tube2x2x025.mdl")
+}else{
+    holoCreate(2, Target:massCenter(), vec(0.3,0.3,0.1)*vec(Scale,Scale,Scale), ang(0,0,0), vec(0,0,120), "models/hunter/tubes/tube2x2x025.mdl")
+}
+
+if(Sel==2){
+    holoCreate(3, Target:massCenter(), vec(0.3,0.3,0.1)*vec(Scale,Scale,Scale), ang(-90,0,0), vec(255,0,0), "models/hunter/tubes/tube2x2x025.mdl")
+}else{
+    holoCreate(3, Target:massCenter(), vec(0.3,0.3,0.1)*vec(Scale,Scale,Scale), ang(-90,0,0), vec(120,0,0), "models/hunter/tubes/tube2x2x025.mdl")
+}
+
+if(Sel==3){
+    holoCreate(4, Target:massCenter(), vec(0.3,0.3,0.1)*vec(Scale,Scale,Scale), ang(0,0,-90), vec(0,255,0), "models/hunter/tubes/tube2x2x025.mdl")
+}else{
+    holoCreate(4, Target:massCenter(), vec(0.3,0.3,0.1)*vec(Scale,Scale,Scale), ang(0,0,-90), vec(0,120,0), "models/hunter/tubes/tube2x2x025.mdl")
+}
+}
+if(clk("holo")){
+    holoMaterial(1, "skybox/sky_fogdn")
+    holoParent(1, Target)
+    holoMaterial(2, "skybox/sky_fogdn")
+    holoParent(2, Target)
+    holoMaterial(3, "skybox/sky_fogdn")
+    holoParent(3, Target)
+    holoMaterial(4, "skybox/sky_fogdn")
+    holoParent(4, Target)
+}
+while(I<Players:count()){
+    Ply=Players[I,entity]
+    if(Ply!=owner()){
+        holoVisible(1, Ply, 0)
+        holoVisible(2, Ply, 0)
+        holoVisible(3, Ply, 0)
+        holoVisible(4, Ply, 0)
+    }
+    I++
+}
+}
+
