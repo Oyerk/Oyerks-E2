@@ -1,0 +1,59 @@
+@name tile build test 
+@outputs Size I K:string S
+@persist Size I K:string SizeTable:array S
+@strict
+
+function vector oyerkClamp(Input:vector, Divisor:number){
+    return vec(round(Input:x()/Divisor)*Divisor,round(Input:y()/Divisor)*Divisor,round(Input:z()/Divisor)*Divisor)
+}
+if(first()){
+    SizeTable=array(
+    1=06,
+    2=12,
+    3=24,
+    4=36,
+    5=48,
+    6=96
+    )
+    S=4
+    I=0
+    Size=SizeTable[4,number]
+    holoCreate(1, oyerkClamp(owner():aimPos(), Size), vec(1), ang(0), vec(255), "models/sprops/cuboids/height"+Size+"/size_1/cube_"+Size+"x"+Size+"x"+Size+".mdl")
+    holoColor(1, vec4(255,255,255,100))                                           
+}
+
+event tick(){
+    holoPos(1, oyerkClamp(owner():aimPos(), Size))
+}
+
+event keyPressed(Player:entity, Key:string, Down:number, KeyBind:string) {
+    if(Player==owner() & owner():weapon():type()=="none"){
+        K=Key
+        if(K=="mouse_right" & Down){
+            I=1
+        }
+        if(K=="up" & Down & S<SizeTable:count()){
+            S++
+            Size=SizeTable[S,number]
+            holoModel(1, "models/sprops/cuboids/height"+Size+"/size_1/cube_"+Size+"x"+Size+"x"+Size+".mdl")
+        }
+        if(K=="down" & Down & S>1){
+            S--
+            Size=SizeTable[S,number]
+            if(S==1){
+                holoModel(1, "models/sprops/cuboids/height0"+Size+"/size_1/cube_"+Size+"x"+Size+"x"+Size+".mdl")
+            }else{
+                holoModel(1, "models/sprops/cuboids/height"+Size+"/size_1/cube_"+Size+"x"+Size+"x"+Size+".mdl")
+            }
+        }
+    }
+}
+interval(100)
+if(I){
+    if(S==1){
+        propSpawn("models/sprops/cuboids/height0"+Size+"/size_1/cube_"+Size+"x"+Size+"x"+Size+".mdl", oyerkClamp(owner():aimPos()-vec(1.5,1.5,1.5), Size), ang(0), 1)
+    }else{
+        propSpawn("models/sprops/cuboids/height"+Size+"/size_1/cube_"+Size+"x"+Size+"x"+Size+".mdl", oyerkClamp(owner():aimPos(), Size), ang(0), 1)
+    }
+    I=0
+}
