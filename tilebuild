@@ -2,7 +2,12 @@
 @outputs Size I K:string S
 @persist Size I K:string SizeTable:array S
 @strict
-
+#-------------------------#
+#  !USE THE HANDS SWEP!   #
+#Press RMB to place blocks#
+# Press Up/Down Arrow keys#
+#  to change block size   #
+#-------------------------#
 function vector oyerkClamp(Input:vector, Divisor:number){
     return vec(round(Input:x()/Divisor)*Divisor,round(Input:y()/Divisor)*Divisor,round(Input:z()/Divisor)*Divisor)
 }
