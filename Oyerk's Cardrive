@@ -1,0 +1,53 @@
+@name Oyerk's CarDrive
+@inputs [FR FL RR RL Baseplate]:entity Forward Backward MPH
+@outputs AngVelFR AngVelFL AngVelRR AngVelRL SpeedDiff AverageRatio PowerPercent
+@persist AngVelFR AngVelFL AngVelRR AngVelRL SpeedDiff AverageRatio PowerPercent Power WHSPDRatio SPDRatio TCS
+#made by Oyerk
+#------------NOTICE------------#
+#this car drive chip is        #
+#equipped with a TCS system.   #
+#before the TCS will work, you #
+#will need to get the car to   #
+#speed, then use the AngVelFR  #
+#and MPH outputs to find your  #
+#WHSPDRatio and SPDRatio       #
+#values. Please disable TCS    #
+#during this test.             #
+#------------------------------#
+#
+if(first()){
+#-------config-------#
+    Power = 150000 #amount of power sent to wheels
+    WHSPDRatio = 2700 #wheelspeed which the wheels dont slip at SPDRatio
+    SPDRatio = 40 #speed in MPH which the wheel dont slip
+    TCS = 1 #any nonzero value enables TCS, 0 turn it off
+#------end config----#
+}
+
+event tick(){
+    AngVelFR = abs(FR:angVel():pitch())
+    AngVelFL = abs(FL:angVel():pitch())
+    AngVelRR = abs(RR:angVel():pitch())
+    AngVelRL = abs(RL:angVel():pitch())
+    AverageRatio = ((AngVelFR / WHSPDRatio) + (AngVelFL / WHSPDRatio) + (AngVelRL / WHSPDRatio) + (AngVelRR / WHSPDRatio)) / 4
+    SpeedDiff = AverageRatio-(MPH/SPDRatio)
+    PowerRatio = Power*(1-(abs(SpeedDiff)*2))
+    Baseplate:applyForce(vec(0, 0, MPH * 30))
+    if(TCS){
+        PowerPercent = (PowerRatio / Power) * 100
+    }else{
+        PowerPercent = 100
+    }
+    if(Forward){
+        FR:applyAngForce(ang(-PowerRatio, 0, 0))
+        FL:applyAngForce(ang(PowerRatio, 0, 0))
+        RR:applyAngForce(ang(-PowerRatio, 0, 0))
+        RL:applyAngForce(ang(PowerRatio, 0, 0))
+    }
+    if(Backward){
+        FR:applyAngForce(ang(PowerRatio, 0, 0))
+        FL:applyAngForce(ang(-PowerRatio, 0, 0))
+        RR:applyAngForce(ang(PowerRatio, 0, 0))
+        RL:applyAngForce(ang(-PowerRatio, 0, 0))
+    }
+}
