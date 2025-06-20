@@ -20,7 +20,7 @@ if(first()){
     Power = 150000 #amount of power sent to wheels
     WHSPDRatio = 2700 #wheelspeed which the wheels dont slip at SPDRatio
     SPDRatio = 40 #speed in MPH which the wheel dont slip
-    TCS = 1 #any nonzero value enables TCS, 0 turn it off
+    TCS = 0 #any nonzero value enables TCS, 0 turn it off
 #------end config----#
 }
 
@@ -31,12 +31,13 @@ event tick(){
     AngVelRL = abs(RL:angVel():pitch())
     AverageRatio = ((AngVelFR / WHSPDRatio) + (AngVelFL / WHSPDRatio) + (AngVelRL / WHSPDRatio) + (AngVelRR / WHSPDRatio)) / 4
     SpeedDiff = AverageRatio-(MPH/SPDRatio)
-    PowerRatio = Power*(1-(abs(SpeedDiff)*2))
     Baseplate:applyForce(vec(0, 0, MPH * 30))
     if(TCS){
+        PowerRatio = Power*(1-(abs(SpeedDiff)*2))
         PowerPercent = (PowerRatio / Power) * 100
     }else{
         PowerPercent = 100
+        PowerRatio = Power
     }
     if(Forward){
         FR:applyAngForce(ang(-PowerRatio, 0, 0))
