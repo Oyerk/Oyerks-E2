@@ -1,7 +1,7 @@
 @name Oyerk's CarDrive
-@inputs [FR FL RR RL Baseplate]:entity Forward Backward MPH
-@outputs AngVelFR AngVelFL AngVelRR AngVelRL SpeedDiff AverageRatio PowerPercent
-@persist AngVelFR AngVelFL AngVelRR AngVelRL SpeedDiff AverageRatio PowerPercent Power WHSPDRatio SPDRatio TCS
+@inputs [FR FL RR RL Baseplate]:entity Forward Backward
+@outputs AngVelFR AngVelFL AngVelRR AngVelRL SpeedDiff AverageRatio PowerPercent MPH
+@persist AngVelFR AngVelFL AngVelRR AngVelRL SpeedDiff AverageRatio PowerPercent Power WHSPDRatio SPDRatio TCS MPH
 #made by Oyerk
 #------------NOTICE------------#
 #this car drive chip is        #
@@ -25,6 +25,7 @@ if(first()){
 }
 
 event tick(){
+    MPH = round(toUnit("mph",Baseplate:vel():length()))
     AngVelFR = abs(FR:angVel():pitch())
     AngVelFL = abs(FL:angVel():pitch())
     AngVelRR = abs(RR:angVel():pitch())
