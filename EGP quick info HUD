@@ -1,0 +1,63 @@
+@name Oyerk's EGP Quick Info
+@inputs EGP:wirelink
+@outputs Clip ClipSize AmmoType:string Centre:vector2
+@persist Clip ClipSize Centre:vector2
+#Made by Oyerk
+#simple EGP quick info hud, i would reccomend running crosshair 0 in console to disable regular crosshair
+#just attach to an EGP hud
+
+if(first()){
+    Centre = vec2(egpScrW(owner())/2, egpScrH(owner())/2)
+    EGP:egpClear()
+    EGP:egpText(1, "100", Centre+vec2(-45, 30))
+    EGP:egpColor(1, vec(255,0,0))
+    EGP:egpAlign(1, 1)
+    EGP:egpText(2, "25", Centre+vec2(-45, 45)) 
+    EGP:egpColor(2, vec(0,255,255))
+    EGP:egpAlign(2, 1)
+    EGP:egpText(3, "6", Centre+vec2(30, 30))
+    EGP:egpText(4, "32", Centre+vec2(30, 45))
+    EGP:egpBox(5, Centre, vec2(2))
+    EGP:egpBox(6, Centre-vec2(-15, 0), vec2(10, 2))
+    EGP:egpBox(7, Centre-vec2(15, 0), vec2(10, 2))
+    EGP:egpBox(8, Centre-vec2(0, -15), vec2(2, 10))
+    EGP:egpBox(9, Centre+vec2(-55, 30), vec2(50, 3))
+    EGP:egpColor(9, vec(255,0,0))
+    EGP:egpBox(10, Centre+vec2(-55, 27), vec2(50, 3))
+    EGP:egpColor(10, vec(0,255,255))
+    EGP:egpBox(11, Centre+vec2(55, 30), vec2(50, 3))
+    EGP:egpColor(11, vec(100))
+    EGP:egpBox(12, Centre+vec2(55, 30), vec2(50, 3))
+}
+
+event tick(){
+    Health = owner():health()
+    Armor = owner():armor()
+    Clip = owner():weapon():clip1()
+    ClipSize = owner():weapon():clip1Size()
+    AmmoType = owner():weapon():primaryAmmoType()
+    Ammo = owner():ammoCount(AmmoType)
+    if(Clip != -1 & ClipSize != 0){
+        EGP:egpSetText(3, Clip:toString()+"/"+ClipSize)
+        EGP:egpSetText(4, Ammo:toString())
+        EGP:egpBox(12, Centre+vec2(30+(Clip/ClipSize)*25, 30), vec2((Clip/ClipSize)*50, 3))
+        EGP:egpAlpha(11, 255)
+    }else{
+        EGP:egpSetText(3, "")
+        EGP:egpRemove(12)
+        EGP:egpAlpha(11, 0)
+        if(Ammo !=0 & Ammo!=-1){
+            EGP:egpSetText(4, Ammo:toString())
+        }else{
+            EGP:egpSetText(4, "")
+        }
+    }
+    EGP:egpSetText(1, Health:toString())
+    EGP:egpSetText(2, Armor:toString())
+    EGP:egpBox(9, Centre+vec2(-30-(Health/100)*25, 30), vec2((Health/100)*50, 3))
+    EGP:egpBox(10, Centre+vec2(-30-(Armor/100)*25, 27), vec2((Armor/100)*50, 3))
+}
+
+if(~EGP){
+    reset()
+}
