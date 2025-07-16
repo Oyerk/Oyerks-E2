@@ -1,0 +1,65 @@
+@name PrvChtClient
+@outputs HEADER:string
+@persist Mode
+#made by Oyerk
+#simple private chat chip using datasignal
+#CHAT COMMANDS:
+#.mode | sets the mode (.mode 1 to disable global chat, .mode 0 to enable global chat) (default: 0)
+#.list | lists users connected
+#.send | sends a message if mode is set to 0
+
+if(first()){
+    Mode = 0
+    dsJoinGroup("chat") #chat channel
+    dsSetScope(2) #sets global scope
+    dsSend("JOIN", "chat", owner():name()+" joined!") #declare your arrival
+}
+
+if(dsClk()){
+    HEADER = dsClkName()
+    print(HEADER+"|"+dsGetString())
+}
+
+function wait(){
+    stoptimer("wait")
+    timer("wait", 0.25, function(){
+        if(Mode == 0){
+            hideChat(0)
+        }
+    })
+}
+
+event chat(Player:entity, Message:string, Team:number) {
+    if(Player == owner()){
+        local STR = Message:explode(" ")
+        local CMD = STR[1, string]
+        local ARG = STR[2, string]
+        if(CMD == ".mode"){
+            hideChat(1)
+            Mode = clamp(ARG:toNumber(), 0, 1)
+            print("CNFG|Set mode to "+Mode)
+        }elseif(CMD == ".send" & Mode == 0){
+            hideChat(1)
+            dsSend("CHAT", "chat", owner():name()+": "+Message:replace(".send ", ""))
+            print("CHAT|"+owner():name()+": "+Message:replace(".send ", ""))
+        }elseif(CMD == ".list"){
+            hideChat(1)
+            local I = 1
+            local List = dsProbe("chat")
+            local String = ""
+            stoptimer("ping")
+            timer("ping", 0, List:count(), function(){
+                String = String+"\n"+List[I, entity]:owner():name()
+                I++
+                if(I>List:count()){
+                    print("Connected Players:"+String)
+                }
+            })
+        }elseif(Mode == 1){
+            hideChat(1)
+            dsSend("CHAT", "chat", owner():name()+": "+Message)
+            print("CHAT|"+owner():name()+": "+Message)
+        }
+        wait()
+    }
+}
