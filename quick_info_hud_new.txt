@@ -1,0 +1,381 @@
+@name quick info hud new
+@inputs EGP:wirelink
+@outputs ScreenSize:vector2 Ops CPU HealthDelta Health HealthOld
+@persist [PolyHealth PolySuit PolyAmmo PolyMedkit]:array Health HealthDelta HealthOld ArmorOld ArmorDelta Armor Weapon:entity ClipRatio
+@persist Clip ClipSize AmmoType:string ClipOld ClipDelta ScreenSize I WeaponOld:entity MedkitReserve Flash DmgCombo
+@persist X_Offset Y_Offset Scale Hash_Marks
+#made by Oyerk
+if(first()){
+    #--------------------------------------HUD OPTIONS--------------------------------------#
+    X_Offset = 0 #Adjusts bar's X positions, higher val = outwards, lower val = inwards     #
+    Y_Offset = 0 #Adjusts bar's Y positions, higher val = move up, lower val = move down    #
+    Scale = 1.5 #Scale ratio, default 1                                                       #
+    Hash_Marks = 15 #amount of hash marks for the ammo indicator, default 15                #
+    #TIPS:                                                                                  #
+    #If the bars are too small, increase scale                                              #
+    #If the bars are too big, decrease scale                                                #
+    #adjust X and Y offset to your liking                                                   #
+    #if you find the amount of hash marks is incorrect, increase or decrease as preferred.  #
+    #--------------------------------------END OPTIONS--------------------------------------#
+
+
+    EGP:egpClear()
+    EGP:egpDrawTopLeft(0)
+    ScreenSize = vec2(egpScrW(owner())/2, egpScrH(owner())/2)
+    EGP:egpBox(85, ScreenSize, vec2(2))
+    EGP:egpBox(86, ScreenSize-vec2(-15, 0), vec2(10, 2))
+    EGP:egpBox(87, ScreenSize-vec2(15, 0), vec2(10, 2))
+    EGP:egpBox(88, ScreenSize-vec2(0, -15), vec2(2, 10))
+    MedkitReserve = 100
+    HealthOld = 100
+    HealthDelta = 0
+    ArmorOld = 50
+    ArmorDelta = 0
+    ClipOld = 0
+    ClipDelta = 0
+    Flash = 1
+    DmgCombo = 0
+    WeaponOld = owner():weapon()
+    I=1
+    PolyHealth = array(
+        ScreenSize-vec2(30+X_Offset,-30+Y_Offset)*Scale,
+        ScreenSize-vec2(30+X_Offset,-20+Y_Offset)*Scale,
+        ScreenSize-vec2(180+X_Offset,-20+Y_Offset)*Scale,
+        ScreenSize-vec2(160+X_Offset,-30+Y_Offset)*Scale
+    )
+    PolySuit = array(
+        ScreenSize-vec2(30+X_Offset,-30+Y_Offset)*Scale,
+        ScreenSize-vec2(30+X_Offset,-40+Y_Offset)*Scale,
+        ScreenSize-vec2(140+X_Offset,-40+Y_Offset)*Scale,
+        ScreenSize-vec2(160+X_Offset,-30+Y_Offset)*Scale
+    )
+    PolyAmmo = array(
+        ScreenSize+vec2(30+X_Offset,30-Y_Offset)*Scale,
+        ScreenSize+vec2(30+X_Offset,20-Y_Offset)*Scale,
+        ScreenSize+vec2(180+X_Offset,20-Y_Offset)*Scale,
+        ScreenSize+vec2(160+X_Offset,30-Y_Offset)*Scale
+    )
+    PolyMedkit = array(
+        ScreenSize+vec2(30+X_Offset,30-Y_Offset)*Scale,
+        ScreenSize+vec2(30+X_Offset,40-Y_Offset)*Scale,
+        ScreenSize+vec2(140+X_Offset,40-Y_Offset)*Scale,
+        ScreenSize+vec2(160+X_Offset,30-Y_Offset)*Scale
+    )
+    EGP:egpPoly(998, PolyHealth)
+    EGP:egpColor(998, vec(100,0,0))
+    EGP:egpPoly(1, PolyHealth)
+    EGP:egpColor(1, vec(255,0,0))
+    EGP:egpPolyOutline(2, PolyHealth)
+    EGP:egpText(60, "100", PolyHealth[1, vector2]-vec2(1,10*Scale))
+    EGP:egpFont(60, "font", 10*Scale)
+    EGP:egpAlign(60,2)
+    EGP:egpText(65, "Hit by (PLAYER) | -75", PolyHealth[2, vector2]-vec2(1,10*Scale))
+    EGP:egpFont(65, "font", 10*Scale)
+    EGP:egpAlign(65,2)
+    EGP:egpColor(65, vec(255,0,0))
+    EGP:egpAlpha(65, 0)
+    EGP:egpText(67, "Killed By (PLAYER)", PolyHealth[2, vector2]-vec2(1,20*Scale))
+    EGP:egpFont(67, "font", 10*Scale)
+    EGP:egpAlign(67,2)
+    EGP:egpColor(67, vec(255,0,0))
+    EGP:egpAlpha(67, 0)
+
+    EGP:egpPoly(99, PolySuit)
+    EGP:egpColor(99, vec(0,100,100))
+    EGP:egpPoly(3, PolySuit)
+    EGP:egpColor(3, vec(0,255,255))
+    EGP:egpPolyOutline(4, PolySuit)
+    EGP:egpText(61, "50", PolySuit[2, vector2]-vec2(1,10*Scale))
+    EGP:egpFont(61, "font", 10*Scale)
+    EGP:egpAlign(61,2)
+
+    EGP:egpPoly(95, PolyAmmo)
+    EGP:egpColor(95, vec(100))
+    EGP:egpPoly(7, PolyAmmo)
+    EGP:egpColor(7, vec(200))
+    EGP:egpPolyOutline(8, PolyAmmo)
+    EGP:egpText(62, "6/6", PolyAmmo[1, vector2]-vec2(-1,10*Scale))
+    EGP:egpFont(62, "font", 10*Scale)
+    EGP:egpPolyOutline(8, PolyAmmo)
+    EGP:egpText(66, "-75 | (PLAYER)", PolyAmmo[2, vector2]-vec2(-1,10*Scale))
+    EGP:egpFont(66, "font", 10*Scale)
+    EGP:egpAlpha(66, 0)
+    EGP:egpText(68, "Killed Player", PolyAmmo[2, vector2]-vec2(-1,20*Scale))
+    EGP:egpFont(68, "font", 10*Scale)
+    EGP:egpAlpha(68, 0)
+    EGP:egpText(63, "32", PolyAmmo[4, vector2]-vec2(-2,10*Scale))
+    EGP:egpFont(63, "font", 10*Scale)
+    EGP:egpAlign(63, 2)
+    EGP:egpColor(63, vec(0))
+
+    EGP:egpPoly(75, PolyMedkit)
+    EGP:egpColor(75, vec(100,0,10))
+    EGP:egpPoly(10, PolyMedkit)
+    EGP:egpColor(10, vec(255,0,50))
+    EGP:egpPolyOutline(11, PolyMedkit)
+    EGP:egpText(64, "50", PolyMedkit[2, vector2]-vec2(-1,10*Scale))
+    EGP:egpFont(64, "font", 10*Scale)
+
+    EGP:egpPoly(5, vec2(0), vec2(0), vec2(0))
+    EGP:egpColor(5, vec(255,255,0))
+    EGP:egpPoly(6, vec2(0), vec2(0), vec2(0))
+    EGP:egpColor(6, vec(255,255,0))
+    
+    EGP:egpText(501, "100%, 25%", ScreenSize-vec2(0,20))
+    EGP:egpText(502, "Player | Rank", ScreenSize-vec2(0,34))
+    EGP:egpAlign(501, 1)
+    EGP:egpAlign(502, 1)
+}
+
+
+
+timer("loop", 0.05, 0, function(){
+    CPU = cpuUsage()*1000000
+    Ops = ops()
+    Weapon = owner():weapon()
+    Clip = Weapon:clip1()
+    ClipSize = Weapon:clip1Size()
+    ClipRatio = (Clip/ClipSize)*100
+    AmmoType = Weapon:primaryAmmoType()
+    Ammo = owner():ammoCount(AmmoType)
+    Health = owner():health()
+    Armor = owner():armor()
+    EGP:egpSetText(60, round(HealthOld):toString())
+    EGP:egpSetText(61, round(ArmorOld):toString())
+    EGP:egpSetText(62, Clip+"/"+ClipSize)
+    EGP:egpSetText(63, round(Ammo):toString())
+    EGP:egpSetText(64, round(MedkitReserve):toString())
+
+    if(HealthOld != Health){
+        PolyHealth[4, vector2] = ScreenSize-vec2(clamp(((Health/owner():maxHealth())*150)-20, 0, 130)+30+X_Offset, -30+Y_Offset)*Scale
+        PolyHealth[3, vector2] = ScreenSize-vec2(clamp((Health/owner():maxHealth())*150, 0, 150)+30+X_Offset, -20+Y_Offset)*Scale
+        EGP:egpPoly(1, PolyHealth)
+        HealthDelta = round((HealthOld-Health)*10)/10
+        PolyHealthEffect = array(
+            PolyHealth[3, vector2],
+            PolyHealth[4, vector2],
+            PolyHealth[4, vector2]-vec2(HealthDelta,0),
+            PolyHealth[3, vector2]-vec2(HealthDelta,0)
+        )
+        EGP:egpPoly(5, PolyHealthEffect)
+    }
+    if(ArmorOld != Armor){
+        PolySuit[3, vector2] = ScreenSize-vec2(clamp(((Armor/50)*130)-20, 0, 110)+30+X_Offset, -40+Y_Offset)*Scale
+        PolySuit[4, vector2] = ScreenSize-vec2(clamp((Armor/50)*130, 0, 130)+30+X_Offset, -30+Y_Offset)*Scale
+        EGP:egpPoly(3, PolySuit)
+        ArmorDelta = round((ArmorOld-Armor)*10)/10
+        PolyArmorEffect = array(
+            PolySuit[3, vector2],
+            PolySuit[4, vector2],
+            PolySuit[4, vector2]-vec2(ArmorDelta,0),
+            PolySuit[3, vector2]-vec2(ArmorDelta,0)
+        )
+        EGP:egpPoly(6, PolyArmorEffect)
+    }
+    ClipDelta = round((ClipOld-ClipRatio)*10)/10
+    if(Clip != ClipOld){
+        if(Clip != -1 & ClipSize != 0){
+            PolyAmmo[4, vector2] = ScreenSize+vec2(clamp(((Clip/ClipSize)*150)-20, 0, 150)+30+X_Offset, 30-Y_Offset)*Scale
+            PolyAmmo[3, vector2] = ScreenSize+vec2((Clip/ClipSize)*150+30+X_Offset, 20-Y_Offset)*Scale
+            EGP:egpPoly(7, PolyAmmo)
+            PolyClipEffect = array(
+                PolyAmmo[3, vector2],
+                PolyAmmo[4, vector2],
+                PolyAmmo[4, vector2]+vec2(ClipDelta,0),
+                PolyAmmo[3, vector2]+vec2(ClipDelta,0)
+            )
+            EGP:egpPoly(9, PolyClipEffect)
+        }else{
+            EGP:egpPoly(7, vec2(0), vec2(0), vec2(0))
+            EGP:egpPoly(9, vec2(0), vec2(0), vec2(0))
+        }
+    }
+    if(ClipRatio<40){
+        EGP:egpColor(62, vec(255*Flash))
+        EGP:egpColor(7, vec(Flash*255,0,0))
+    }else{
+        EGP:egpColor(62, vec(0))
+        EGP:egpColor(7, vec(200))
+    }
+    if(Health<40){
+        EGP:egpColor(60, vec(255*Flash))
+        EGP:egpColor(1, vec(Flash*255,0,0))
+    }else{
+        EGP:egpColor(60, vec(255))
+        EGP:egpColor(1, vec(255,0,0))
+    }
+    if(MedkitReserve<40){
+        EGP:egpColor(64, vec(255*Flash))
+        EGP:egpColor(10, vec(Flash*255,0,10))
+    }else{
+        EGP:egpColor(64, vec(255))
+        EGP:egpColor(10, vec(255,0,50))
+    }
+})
+
+timer("delta", 0.1, 0, function(){
+    if(ArmorOld != Armor){
+        if(ArmorOld<Armor){
+            ArmorOld=ArmorOld+abs(ArmorDelta/2)
+        }
+        if(ArmorOld>Armor){
+            ArmorOld=ArmorOld-abs(ArmorDelta/2)
+        }
+    }
+    if(HealthOld != Health){
+        if(HealthOld<Health){
+            HealthOld=HealthOld+abs(HealthDelta/2)
+        }
+        if(HealthOld>Health){
+            HealthOld=HealthOld-abs(HealthDelta/2)
+        }
+    }
+    if(ClipOld != ClipRatio){
+        if(ClipOld<ClipRatio){
+            ClipOld=ClipOld+abs(ClipDelta/2)
+            EGP:egpPos(85, ScreenSize)
+            EGP:egpBox(86, ScreenSize-vec2(-15, 0), vec2(10, 2))
+            EGP:egpBox(87, ScreenSize-vec2(15, 0), vec2(10, 2))
+            EGP:egpBox(88, ScreenSize-vec2(0, -15), vec2(2, 10))
+        }
+        if(ClipOld>ClipRatio){
+            ClipOld=ClipOld-abs(ClipDelta/2)
+            local Shake = vec2(random((ClipDelta)/-4,(ClipDelta)/4),random((ClipDelta)/-4,(ClipDelta)/4))
+            EGP:egpPos(85, ScreenSize+Shake)
+            EGP:egpBox(86, ScreenSize-vec2(-15, 0)+Shake, vec2(10, 2))
+            EGP:egpBox(87, ScreenSize-vec2(15, 0)+Shake, vec2(10, 2))
+            EGP:egpBox(88, ScreenSize-vec2(0, -15)+Shake, vec2(2, 10))
+        }
+    }
+    if(HealthOld != Health){
+        if(Health<HealthOld){
+            local Shake = vec2(random((HealthDelta)/-5,(HealthDelta)/5),random((HealthDelta)/-5,(HealthDelta)/5))
+            EGP:egpPos(60, PolyHealth[1, vector2]-vec2(1,10*Scale)+(Shake*Scale))
+        }
+        if(Health>HealthOld){
+            EGP:egpPos(60, PolyHealth[1, vector2]-vec2(1,10*Scale))
+        }
+    }
+    if(ArmorOld != Armor){
+        if(Armor<ArmorOld){
+            local Shake = vec2(random((ArmorDelta)/-5,(ArmorDelta)/5),random((ArmorDelta)/-5,(ArmorDelta)/5))
+            EGP:egpPos(61, PolySuit[2, vector2]-vec2(1,10*Scale)+(Shake*Scale))
+        }
+        if(Armor>ArmorOld){
+            EGP:egpPos(61, PolySuit[2, vector2]-vec2(1,10*Scale))
+        }
+    }
+    if(Weapon:getClass() != "weapon_medkit"){
+        EGP:egpAlpha(10, 255)
+    }else{
+        EGP:egpAlpha(10, 0)
+        MedkitReserve = Clip
+    }
+})
+
+timer("ammothingy", 0, 0, function(){
+    I++
+    if(I<=Hash_Marks){
+        if(Clip != -1 & ClipSize != 0 & ClipSize<=Hash_Marks){
+            local Pos1 = ScreenSize+vec2(clamp(((I/ClipSize)*150)-20, 0, 150)+30+X_Offset, 30-Y_Offset)*Scale
+            local Pos2 = ScreenSize+vec2((I/ClipSize)*150+30+X_Offset, 20-Y_Offset)*Scale
+            if(I<=ClipSize){
+                EGP:egpLine(100+I, Pos1, Pos2)
+                EGP:egpOrder(100+I, 19)
+            }else{
+                EGP:egpRemove(100+I)
+            }
+        }else{
+            EGP:egpRemove(100+I)
+        }
+    }else{
+        if(Weapon!=WeaponOld){
+            WeaponOld = Weapon
+            I = 0
+        }
+    }
+})
+
+timer("medkitfunnyhaha", 1, 0, function(){
+    if(MedkitReserve<100 & Weapon:getClass() != "weapon_medkit"){
+        MedkitReserve = MedkitReserve+2
+    }
+    PolyMedkit[3, vector2] = ScreenSize+vec2(clamp(((MedkitReserve/100)*130)-20, 0, 110)+30+X_Offset, 40-Y_Offset)*Scale
+    PolyMedkit[4, vector2] = ScreenSize+vec2(clamp((MedkitReserve/100)*130, 0, 130)+30+X_Offset, 30-Y_Offset)*Scale
+    EGP:egpPoly(10, PolyMedkit)
+})
+
+timer("flash", 0.25, 0, function(){
+    if(Flash==0.35){
+        Flash = 1
+    }else{
+        Flash = 0.35
+    }
+})
+
+event entityDamage(Victim:entity, Damage:damage) {
+    if(Victim == owner() & Damage:getAttacker() != owner()){
+        stoptimer("dmg")
+        EGP:egpAlpha(65, 255)
+        if(Damage:getAttacker():isPlayer()){
+            EGP:egpSetText(65, Damage:getAttacker():name()+" | -"+ceil(Damage:getAmount()))
+        }elseif(Damage:getAttacker():isNPC()){
+            EGP:egpSetText(65, Damage:getAttacker():getClass()+" | -"+ceil(Damage:getAmount()))
+        }else{
+            EGP:egpSetText(65, "-"+ceil(Damage:getAmount()))
+        }
+    }
+    if(Damage:getAttacker() == owner() & Victim != owner()){
+        DmgCombo = DmgCombo+Damage:getAmount()
+        stoptimer("dmg2")
+        EGP:egpAlpha(66, 255)
+        if(Victim:isPlayer()){
+            EGP:egpSetText(66, "-"+ceil(DmgCombo)+" | "+Victim:name())
+        }elseif(Victim:isNPC()){
+            EGP:egpSetText(66, "-"+ceil(DmgCombo)+" | "+Victim:getClass())
+        }elseif(Victim:getClass()){
+            EGP:egpSetText(66, "-"+ceil(DmgCombo)+" | Prop")
+        }
+    }
+    timer("dmg", 3, function(){
+        EGP:egpAlpha(65, 0)
+    })
+    timer("dmg2", 3, function(){
+        EGP:egpAlpha(66, 0)
+        EGP:egpSetText(66, "")
+        DmgCombo = 0
+    })
+}
+
+event playerDeath(Victim:entity, Inflictor:entity, Attacker:entity) {
+    if(Victim == owner()){
+        stoptimer("death")
+        EGP:egpAlpha(67, 255)
+        if(Attacker:isPlayer()){
+            if(Attacker != owner()){
+                EGP:egpSetText(67, "Killed by "+Attacker:name())
+            }else{
+                EGP:egpSetText(67, "Suicide!")
+            }
+        }elseif(Attacker:isNPC()){
+            EGP:egpSetText(67, "Killed by "+Attacker:getClass())
+        }else{
+            EGP:egpSetText(67, "")
+        }
+    }
+    if(Attacker == owner() & Victim != owner()){
+        stoptimer("death2")
+        EGP:egpAlpha(68, 255)
+        if(Victim:isPlayer()){
+            EGP:egpSetText(68, "Killed "+Victim:name())
+        }
+    }
+    timer("death", 3, function(){
+        EGP:egpAlpha(67, 255)
+        EGP:egpSetText(67, "")
+    })
+    timer("death2", 3, function(){
+        EGP:egpAlpha(68, 255)
+        EGP:egpSetText(68, "")
+    })
+}
