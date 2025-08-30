@@ -5,11 +5,15 @@
 @persist Clip ClipSize AmmoType:string ClipOld ClipDelta ScreenSize I WeaponOld:entity MedkitReserve Flash DmgCombo
 @persist X_Offset Y_Offset Scale Hash_Marks
 #made by Oyerk
+#requires "Oyerk's EGP Lib" to run!
 if(first()){
+    #include "oyerk_libs/egp_lib"
+
+
     #--------------------------------------HUD OPTIONS--------------------------------------#
     X_Offset = 0 #Adjusts bar's X positions, higher val = outwards, lower val = inwards     #
     Y_Offset = 0 #Adjusts bar's Y positions, higher val = move up, lower val = move down    #
-    Scale = 1.5 #Scale ratio, default 1                                                       #
+    Scale = 1.5 #Scale ratio, default 1                                                     #
     Hash_Marks = 15 #amount of hash marks for the ammo indicator, default 15                #
     #TIPS:                                                                                  #
     #If the bars are too small, increase scale                                              #
@@ -61,70 +65,42 @@ if(first()){
         ScreenSize+vec2(140+X_Offset,40-Y_Offset)*Scale,
         ScreenSize+vec2(160+X_Offset,30-Y_Offset)*Scale
     )
-    EGP:egpPoly(998, PolyHealth)
-    EGP:egpColor(998, vec(100,0,0))
-    EGP:egpPoly(1, PolyHealth)
-    EGP:egpColor(1, vec(255,0,0))
+    EGP:egpPolyColor(998, PolyHealth, vec(100,0,0))
+    EGP:egpPolyColor(1, PolyHealth, vec(255,0,0))
     EGP:egpPolyOutline(2, PolyHealth)
-    EGP:egpText(60, "100", PolyHealth[1, vector2]-vec2(1,10*Scale))
-    EGP:egpFont(60, "font", 10*Scale)
+    EGP:egpTextSize(60, "100", PolyHealth[1, vector2]-vec2(1,10*Scale), 10*Scale)
     EGP:egpAlign(60,2)
-    EGP:egpText(65, "Hit by (PLAYER) | -75", PolyHealth[2, vector2]-vec2(1,10*Scale))
-    EGP:egpFont(65, "font", 10*Scale)
+    EGP:egpTextSize(65, "Hit by (PLAYER) | -75", PolyHealth[2, vector2]-vec2(1,10*Scale), 10*Scale, vec4(255,0,0, 0))
     EGP:egpAlign(65,2)
-    EGP:egpColor(65, vec(255,0,0))
-    EGP:egpAlpha(65, 0)
-    EGP:egpText(67, "Killed By (PLAYER)", PolyHealth[2, vector2]-vec2(1,20*Scale))
-    EGP:egpFont(67, "font", 10*Scale)
+    EGP:egpTextSize(67, "Killed By (PLAYER)", PolyHealth[2, vector2]-vec2(1,20*Scale), 10*Scale, vec4(255,0,0,0))
     EGP:egpAlign(67,2)
-    EGP:egpColor(67, vec(255,0,0))
-    EGP:egpAlpha(67, 0)
 
-    EGP:egpPoly(99, PolySuit)
-    EGP:egpColor(99, vec(0,100,100))
-    EGP:egpPoly(3, PolySuit)
-    EGP:egpColor(3, vec(0,255,255))
+    EGP:egpPolyColor(99, PolySuit, vec(0,100,100))
+    EGP:egpPolyColor(3, PolySuit, vec(0,255,255))
     EGP:egpPolyOutline(4, PolySuit)
-    EGP:egpText(61, "50", PolySuit[2, vector2]-vec2(1,10*Scale))
-    EGP:egpFont(61, "font", 10*Scale)
+    EGP:egpTextSize(61, "50", PolySuit[2, vector2]-vec2(1,10*Scale), 10*Scale, vec(255))
     EGP:egpAlign(61,2)
 
-    EGP:egpPoly(95, PolyAmmo)
-    EGP:egpColor(95, vec(100))
-    EGP:egpPoly(7, PolyAmmo)
-    EGP:egpColor(7, vec(200))
+    EGP:egpPolyColor(95, PolyAmmo, vec(100))
+    EGP:egpPolyColor(7, PolyAmmo, vec(200))
     EGP:egpPolyOutline(8, PolyAmmo)
-    EGP:egpText(62, "6/6", PolyAmmo[1, vector2]-vec2(-1,10*Scale))
-    EGP:egpFont(62, "font", 10*Scale)
+    
+    EGP:egpTextSize(62, "6/6", PolyAmmo[1, vector2]-vec2(-1,10*Scale), 10*Scale)
     EGP:egpPolyOutline(8, PolyAmmo)
-    EGP:egpText(66, "-75 | (PLAYER)", PolyAmmo[2, vector2]-vec2(-1,10*Scale))
-    EGP:egpFont(66, "font", 10*Scale)
-    EGP:egpAlpha(66, 0)
-    EGP:egpText(68, "Killed Player", PolyAmmo[2, vector2]-vec2(-1,20*Scale))
-    EGP:egpFont(68, "font", 10*Scale)
-    EGP:egpAlpha(68, 0)
-    EGP:egpText(63, "32", PolyAmmo[4, vector2]-vec2(-2,10*Scale))
-    EGP:egpFont(63, "font", 10*Scale)
-    EGP:egpAlign(63, 2)
-    EGP:egpColor(63, vec(0))
+    EGP:egpTextSize(66, "-75 | (PLAYER)", PolyAmmo[2, vector2]-vec2(-1,10*Scale), 10*Scale, vec4(255,255,255,0))
+    EGP:egpTextSize(68, "Killed Player", PolyAmmo[2, vector2]-vec2(-1,20*Scale), 10*Scale, vec4(255,255,255,0))
+    EGP:egpTextSize(63, "32", PolyAmmo[4, vector2]-vec2(-2,10*Scale), 10*Scale, vec(0))
 
-    EGP:egpPoly(75, PolyMedkit)
-    EGP:egpColor(75, vec(100,0,10))
-    EGP:egpPoly(10, PolyMedkit)
-    EGP:egpColor(10, vec(255,0,50))
+    EGP:egpPolyColor(75, PolyMedkit, vec(100,0,10))
+    EGP:egpPolyColor(10, PolyMedkit, vec(255,0,50))
     EGP:egpPolyOutline(11, PolyMedkit)
-    EGP:egpText(64, "50", PolyMedkit[2, vector2]-vec2(-1,10*Scale))
-    EGP:egpFont(64, "font", 10*Scale)
+    EGP:egpTextSize(64, "50", PolyMedkit[2, vector2]-vec2(-1,10*Scale), 10*Scale)
 
     EGP:egpPoly(5, vec2(0), vec2(0), vec2(0))
     EGP:egpColor(5, vec(255,255,0))
     EGP:egpPoly(6, vec2(0), vec2(0), vec2(0))
     EGP:egpColor(6, vec(255,255,0))
     
-    EGP:egpText(501, "100%, 25%", ScreenSize-vec2(0,20))
-    EGP:egpText(502, "Player | Rank", ScreenSize-vec2(0,34))
-    EGP:egpAlign(501, 1)
-    EGP:egpAlign(502, 1)
 }
 
 
