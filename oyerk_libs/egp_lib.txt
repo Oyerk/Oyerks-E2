@@ -1,0 +1,80 @@
+@name Oyerk_Lib
+
+#how to use this lib:
+
+#[
+    XWL:egpTextSize(N, S, XV2, N, V)
+    Number Index, String Text, Vector2 Pos, Number Size, Vector Color
+    Create a colored and sized egpText object.
+
+    XWL:egpTextColor(N, S, XV2, N, V)
+    Number Index, String Text, Vector2 Pos, Vector Color
+    Creates a colored egpText object.
+    
+    XWL:egpBoxColor(N, XV2, XV2, V)
+    Number Index, Vector2 Pos, Vector2 Size, Vector Color
+    Creates a colored egpBox.
+    
+    XWL:egpBoxOutlineColor(N, XV2, XV2, V)
+    Number Index, Vector2 Pos, Vector2 Size, Vector Color
+    Creates a colored egpBoxOutline.
+    
+    XWL:egpPolyColor(N, R, V)
+    Number Index, Array Args, Vector Color
+    Creates a colored egpPoly with an array for polygon points.
+    
+    XWL:egpPolyOutlineColor(N, R, V)
+    Number Index, Array Args, Vector Color
+    Creates a colored egpPolyOutline with an array for polygon points.
+]#
+
+function libCheck(){
+    return "Oyerk's EGP Lib"
+}
+
+function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:number, Color:vector ){
+    This:egpText( Index, Text, Pos )
+    This:egpFont( Index, "font", Size )
+    This:egpColor( Index, Color )
+}
+
+function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:number ){
+    This:egpText( Index, Text, Pos )
+    This:egpFont( Index, "font", Size )
+}
+
+function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:number, Color:vector4 ){
+    This:egpText( Index, Text, Pos )
+    This:egpFont( Index, "font", Size )
+    This:egpColor( Index, Color )
+}
+
+function wirelink:egpTextColor( Index:number, Text:string, Pos:vector2, Color:vector ){
+    This:egpText( Index, Text, Pos )
+    This:egpColor( Index, Color )
+}
+
+function wirelink:egpTextColor( Index:number, Text:string, Pos:vector2, Color:vector4 ){
+    This:egpText( Index, Text, Pos )
+    This:egpColor( Index, Color )
+}
+
+function wirelink:egpBoxColor( Index:number, Pos:vector2, Size:vector2, Color:vector ){
+    This:egpBox( Index, Pos, Size )
+    This:egpColor( Index, Color )
+}
+
+function wirelink:egpBoxOutlineColor( Index:number, Pos:vector2, Size:vector2, Color:vector ){
+    This:egpBoxOutline( Index, Pos, Size )
+    This:egpColor( Index, Color )
+}
+
+function wirelink:egpPolyColor( Index:number, Args:array, Color:vector ){
+    This:egpPoly( Index, Args )
+    This:egpColor( Index, Color )
+}
+
+function wirelink:egpPolyOutlineColor( Index:number, Args:array, Color:vector ){
+    This:egpPolyOutline( Index, Args )
+    This:egpColor( Index, Color )
+}
