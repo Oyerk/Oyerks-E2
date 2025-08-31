@@ -4,6 +4,7 @@
 @persist [Data TeamColors RankSort]:table I [Teams RankIndex Players]:array Pos PlayerTally
 # made by oyerk
 # requires Oyerk's EGP Lib to run!
+# https://github.com/Oyerk/Oyerks-E2/blob/main/oyerk_libs/egp_lib.txt
 # place down and connect to an EGP object, no setup required
 if(first()){
     #include "oyerk_libs/egp_lib"
