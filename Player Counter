@@ -1,0 +1,106 @@
+@name player counter
+@inputs EGP:wirelink
+@outputs Data:table RankAmount
+@persist [Data TeamColors RankSort]:table I [Teams RankIndex Players]:array Pos PlayerTally
+
+# requires Oyerk's EGP Lib to run!
+if(first()){
+    #include "oyerk_libs/egp_lib"
+    EGP:egpDrawTopLeft(1)
+    Players = players()
+    Data = table()
+    TeamColors = table( "AFK" = vec( 150 ) )
+    Teams = teams()
+    RankSort = table()
+    RankIndex = array( 1 = "AFK" )
+    for(K=2, Teams:count()){
+        local TeamName = teamName( Teams[K, number] )
+        RankIndex[K, string] = TeamName
+        TeamColors[TeamName, vector] = teamColor( Teams[K, number] )
+    }
+    I = 1
+    timer( "query", 0, Players:count(), function(){
+        local Player = Players[I, entity]
+        if( 1 == 1 ){
+            local Team = teamName( Player:team() )
+            local TeamCount = Data[Team, number]
+            Data[Team, number] = TeamCount + 1
+            RankSort[Team+TeamCount, entity] = Player
+        }else{
+            local Team = "AFK"
+            local TeamCount = Data[Team, number]
+            Data[Team, number] = TeamCount + 1
+            RankSort[Team+TeamCount, entity] = Player
+        }
+        I++
+
+        if( I == Players:count() + 1 ){
+            I=1
+            Pos = 1
+            PlayerTally = 0
+            timer( "", 0, RankIndex:count(), function(){
+                local RankAmount = Players:count()+1
+                local RankI = RankIndex[I, string]
+                local RankQuery = Data[RankI, number]
+                local BlockPos = vec2( 0,  ( PlayerTally / Players:count() )*499 ) + vec2( 0, 16 )
+                local BlockSize = vec2( 20, ( RankQuery / Players:count() ) * 499 )
+                local T_COL = TeamColors[RankI, vector]
+                EGP:egpText( 599, "Rank", vec2( 22, 0 ) )
+                EGP:egpText( 598, "Name", vec2( 152, 0 ) )
+                EGP:egpText( 597, "HP%", vec2( 352, 0 ) )
+                EGP:egpText( 596, "K|D", vec2( 418, 0 ) )
+                EGP:egpText( 595, "Ping", vec2( 478, 0 ) )
+                if( RankQuery != 0 ){
+                    EGP:egpBoxColor( I, ceil( BlockPos ), ceil( BlockSize ), T_COL )
+                    EGP:egpTextColor( RankAmount + I, RankI + ": " + RankQuery, ( BlockPos + vec2( 12, 0 ) ) + ( BlockSize / 2 ), vec2( 0, 1 ), T_COL )
+                    EGP:egpLineColor( ( RankAmount * 2 ) + I, BlockPos, BlockPos + vec2( 512, 0 ), T_COL )
+                    EGP:egpLineColor( ( RankAmount * 3 ) + I, BlockPos + vec2( 150, 0 ), ( BlockSize - vec2( 20, 0 ) ) + BlockPos + vec2( 150, 0 ), T_COL )
+                    for(K = 0, RankQuery){
+                        local TextPos = BlockPos + vec2( 152, ( ( K + 0.5 ) / RankQuery ) * BlockSize:y() )
+                        local Ply = RankSort[RankI+K, entity]
+                        local Index = K + PlayerTally
+                        EGP:egpTextColor( ( RankAmount * 4 ) + Index, Ply:name():left(23), TextPos, vec2( 0, 1 ), T_COL )
+                        EGP:egpTextColor( ( RankAmount * 5 ) + Index, Ply:frags()+"|", TextPos + vec2( 280, 0  ), vec2( 2, 1 ), T_COL )
+                        EGP:egpTextColor( ( RankAmount * 6 ) + Index, Ply:deaths():toString(), TextPos + vec2( 280, 0  ), vec2( 0, 1 ), T_COL)
+                        EGP:egpTextColor( ( RankAmount * 7 ) + Index, Ply:ping()+"ms", TextPos + vec2( 360, 0  ), vec2( 2, 1 ), T_COL )
+                        EGP:egpTextColor( ( RankAmount * 8 ) + Index, clamp(Ply:health(), -999, 9999)+"%", TextPos + vec2( 200, 0  ), vec2( 0, 1 ), T_COL )
+                    }
+                    PlayerTally = PlayerTally + RankQuery
+                    Pos++
+                }else{
+                    if( Data[I, number] == 0 ){
+                        Data:remove( RankI )
+                    }
+                }
+                I++
+            })
+        }
+    })
+
+}
+event playerConnected(Player:entity) {
+    EGP:egpClear()
+    reset()
+}
+
+event playerDisconnected(Player:entity) {
+    EGP:egpClear()
+    reset()
+}
+
+event playerChangedTeam(Player:entity, OldTeam:number, NewTeam:number) {
+    EGP:egpClear()
+    reset()
+}
+
+
+event playerUse(Player:entity, Entity:entity) {
+    if( Entity == entity() & Player == owner() ){
+        EGP:egpClear()
+        reset()
+    }
+}
+
+timer("reset", 10, function(){
+    reset()
+})
