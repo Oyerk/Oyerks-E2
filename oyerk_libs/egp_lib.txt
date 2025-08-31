@@ -26,11 +26,19 @@
     XWL:egpPolyOutlineColor(N, R, V)
     Number Index, Array Args, Vector Color
     Creates a colored egpPolyOutline with an array for polygon points.
+    
+    XWL:egpTouchingCursorSimple(N, E)
+    Number Index, Entity Player
+    Performs a simple check if the cursor is within the distance of the object's size, for simple collision checking.
+    
+    XWL:egpTouchingCursor(N, E)
+    Number Index, Entity Player
+    Checks if the player's cursor is within the X and Y bounds of the object size, for boxes and non-square objects.
+    
+    XWL:egpLineColor(N, XV2, XV2, V)
+    Number Index, Vector2 Pos 1, Vector2 Pos 2, Vector Color
+    Creates a colored egpLine.
 ]#
-
-function libCheck(){
-    return "Oyerk's EGP Lib"
-}
 
 function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:number, Color:vector ){
     This:egpText( Index, Text, Pos )
@@ -38,9 +46,22 @@ function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:numb
     This:egpColor( Index, Color )
 }
 
+function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:number, Align:vector2, Color:vector ){
+    This:egpText( Index, Text, Pos )
+    This:egpFont( Index, "font", Size )
+    This:egpColor( Index, Color )
+    This:egpAlign( Index, Align:x(), Align:y() )
+}
+
 function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:number ){
     This:egpText( Index, Text, Pos )
     This:egpFont( Index, "font", Size )
+}
+
+function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:number, Align:vector2 ){
+    This:egpText( Index, Text, Pos )
+    This:egpFont( Index, "font", Size )
+    This:egpAlign( Index, Align:x(), Align:y() )
 }
 
 function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:number, Color:vector4 ){
@@ -52,6 +73,12 @@ function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:numb
 function wirelink:egpTextColor( Index:number, Text:string, Pos:vector2, Color:vector ){
     This:egpText( Index, Text, Pos )
     This:egpColor( Index, Color )
+}
+
+function wirelink:egpTextColor( Index:number, Text:string, Pos:vector2, Align:vector2, Color:vector ){
+    This:egpText( Index, Text, Pos )
+    This:egpColor( Index, Color )
+    This:egpAlign( Index, Align:x(), Align:y() )
 }
 
 function wirelink:egpTextColor( Index:number, Text:string, Pos:vector2, Color:vector4 ){
@@ -76,5 +103,32 @@ function wirelink:egpPolyColor( Index:number, Args:array, Color:vector ){
 
 function wirelink:egpPolyOutlineColor( Index:number, Args:array, Color:vector ){
     This:egpPolyOutline( Index, Args )
+    This:egpColor( Index, Color )
+}
+
+function wirelink:egpTouchingCursorSimple( Index:number, EntCursor:entity ){
+    local Cursor = This:egpCursor(EntCursor)
+    local Size = This:egpSize( Index ):x()
+    local ObjPos = This:egpPos( Index )
+    if( Cursor:distance(ObjPos) <= Size ){
+        return 1
+    }else{
+        return 0
+    }
+}
+
+function wirelink:egpTouchingCursor( Index:number, EntCursor:entity ){
+    local Cursor = This:egpCursor(EntCursor)
+    local Size = This:egpSize( Index )
+    local ObjPos = This:egpPos( Index )
+    if( abs( Cursor:x() - ObjPos:x() ) <= Size:x() & abs( Cursor:y() - ObjPos:y() ) <= Size:y() ){
+        return 1
+    }else{
+        return 0
+    }
+}
+
+function wirelink:egpLineColor( Index:number, Pos1:vector2, Pos2:vector2, Color:vector ){
+    This:egpLine( Index, Pos1, Pos2 )
     This:egpColor( Index, Color )
 }
