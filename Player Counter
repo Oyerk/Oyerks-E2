@@ -41,6 +41,9 @@ if(first()){
             PlayerTally = 0
             timer( "", 0, RankIndex:count(), function(){
                 local RankAmount = Players:count()+1
+                if( RankIndex:count() > Players:count() ){
+                    RankAmount = RankIndex:count()
+                }
                 local RankI = RankIndex[I, string]
                 local RankQuery = Data[RankI, number]
                 local BlockPos = vec2( 0,  ( PlayerTally / Players:count() )*499 ) + vec2( 0, 16 )
