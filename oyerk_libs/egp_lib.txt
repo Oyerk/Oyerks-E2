@@ -121,7 +121,7 @@ function wirelink:egpTouchingCursor( Index:number, EntCursor:entity ){
     local Cursor = This:egpCursor(EntCursor)
     local Size = This:egpSize( Index )
     local ObjPos = This:egpPos( Index )
-    if( abs( Cursor:x() - ObjPos:x() ) <= Size:x() & abs( Cursor:y() - ObjPos:y() ) <= Size:y() ){
+    if( abs( Cursor:x() - ObjPos:x() ) <= Size:x()/2 & abs( Cursor:y() - ObjPos:y() ) <= Size:y()/2 ){
         return 1
     }else{
         return 0
