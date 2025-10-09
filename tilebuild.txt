@@ -89,7 +89,7 @@ timer("loop", 0.1, 0, function(){
         holoPos(1, oyerkRound(owner():aimPos(), 32)+vec(0,0,64))
     }
     if(owner():weapon():getClass()=="none"){
-        holoAlpha(1, 255)
+        holoAlpha(1, 150)
     }else{
         holoAlpha(1, 0)
     }
