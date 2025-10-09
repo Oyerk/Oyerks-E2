@@ -1,0 +1,207 @@
+@name Tilebuild
+@persist EGP:wirelink ScreenSize:vector2 [Platforms Walls]:array
+@persist Type:string Rotation:angle Placing:string I Delay AngSel
+@outputs Rotation:angle AngSel
+#made by Oyerk
+#this chip requires the following libraries to work:
+#wirelink_handshake
+#egp_lib
+#if you do not have these, install them from my (Oyerk's) github.
+function vector oyerkRound(Input:vector, Divisor:number){
+    return vec(round(Input:x()/Divisor)*Divisor,
+               round(Input:y()/Divisor)*Divisor,
+               round(Input:z()/Divisor)*Divisor
+              )
+}
+
+if(first()){
+    #include "oyerk_libs/wirelink_handshake"
+    #include "oyerk_libs/egp_lib"
+    EGP = entity():initXWL("gmod_wire_egp_hud")
+    ScreenSize = egpScrSize(owner())
+    Platforms = array(
+        "platform2",
+        "platform3",
+        "platform4",
+        "platform5"
+    )
+    Walls = array(
+        "metalwalling",
+        "doorframe",
+        "windowduo",
+        "windowbig",
+        "glasspane",
+        "platform1",
+        "metalstairs"
+    )
+    Placing = "Platform"
+    Rotation = ang(0)
+    I = 1
+    Delay = 0
+    AngSel = 1
+    Type = Platforms[1, string]
+    EGP:egpRoundedBoxColor(1, ScreenSize*0.8, vec2(310, 210), vec(150))
+    EGP:egpTextSize(2, "Placing: "+Placing, vec2(-150,-90), 25, vec2(0,1),  vec(0))
+     EGP:egpParent(2, 1)
+    EGP:egpTextSize(3, ("Rotation: "+Rotation):replace("ang(",""):replace(")", ""), vec2(-150,-70), 25, vec2(0,1),  vec(0))
+     EGP:egpParent(3, 1)
+    EGP:egpTextSize(4, "Type: "+Type, vec2(-150,-50), 25, vec2(0,1),  vec(0))
+     EGP:egpParent(4, 1)
+    EGP:egpBox(5, vec2(0,25), vec2(150))
+     EGP:egpParent(5, 1)
+     EGP:egpMaterial(5, "spawnicons/models/military/"+Type+".png")
+    EGP:egpTextSize(6, "_", vec2(-51, -72), 25, vec2(0,1), vec(255,0,0))
+     EGP:egpParent(6, 1)
+    local Pos = oyerkRound(owner():aimPos(), 128)
+    holoCreate(1, Pos, vec(1), Rotation, vec(255), "models/military/"+Type+".mdl")
+    holoAlpha(1, 150)
+}
+
+function update(){
+    if(Placing == "Platform"){
+        Type = Platforms[I, string]  
+    }else{
+        Type = Walls[I, string]
+    }
+    EGP:egpSetText(2, "Placing: "+Placing)
+    EGP:egpSetText(3, ("Rotation: "+Rotation):replace("ang(",""):replace(")", ""))
+    EGP:egpSetText(4, "Type: "+Type)
+    EGP:egpMaterial(5, "spawnicons/models/military/"+Type+".png")
+    holoModel(1, "models/military/"+Type+".mdl")
+    holoAng(1, Rotation)
+}
+
+timer("loop", 0.1, 0, function(){
+    if(Placing == "Platform"){
+        holoPos(1, oyerkRound(owner():aimPos(), 32)+vec(64,64,0))
+    }else{
+        holoPos(1, oyerkRound(owner():aimPos(), 32)+vec(0,0,64))
+    }
+    if(owner():weapon():getClass()=="none"){
+        holoAlpha(1, 255)
+    }else{
+        holoAlpha(1, 0)
+    }
+})
+
+event keyPressed(Player:entity, Key:string, Down:number, KeyBind:string) {
+    if(Player==owner() & owner():weapon():getClass()=="none" & !Delay){
+        stoptimer("delay")
+        Delay = 1
+        if(Key == "r"){
+            if(Placing == "Platform"){
+                Placing = "Wall"
+                I = 1
+                Rotation = ang(0)
+                update()
+            }else{
+                Placing = "Platform"
+                I = 1
+                Rotation = ang(0)
+                update()
+            }
+        }
+        if(Key == "right"){
+            if(Placing == "Platform"){
+                if(I == Platforms:count()){
+                    I = 1
+                }else{
+                    I++
+                }
+            }else{
+                if(I == Walls:count()){
+                    I = 1
+                }else{
+                    I++
+                }
+            }
+            update()
+        }
+        if(Key == "left"){
+            if(Placing == "Platform"){
+                if(I < 2){
+                    I = Platforms:count()
+                }else{
+                    I--
+                }
+            }else{
+                if(I < 2){
+                    I = Walls:count()
+                }else{
+                    I--
+                }
+            }
+            update()
+        }
+        if(Key == "pad_4"){
+            switch(AngSel){
+                case 1,
+                    if(Rotation:pitch()>0){
+                        Rotation = Rotation-ang(90, 0, 0)
+                    }
+                    break
+                case 2,
+                    if(Rotation:yaw()>0){
+                        Rotation = Rotation-ang(0, 90, 0)
+                    }
+                    break
+                case 3,
+                    if(Rotation:roll()>0){
+                        Rotation = Rotation-ang(0, 0, 90)
+                    }
+                    break
+            }
+            update()
+        }
+        if(Key == "pad_6"){
+            switch(AngSel){
+                case 1,
+                    if(Rotation:pitch()<360){
+                        Rotation = Rotation+ang(90, 0, 0)
+                    }
+                    break
+                case 2,
+                    if(Rotation:yaw()<360){
+                        Rotation = Rotation+ang(0, 90, 0)
+                    }
+                    break
+                case 3,
+                    if(Rotation:roll()<360){
+                        Rotation = Rotation+ang(0, 0, 90)
+                    }
+                    break
+                    
+            }
+            update()
+            
+        }
+        if(Key == "pad_5"){
+            if(AngSel >=3){
+                AngSel = 1
+            }else{
+                AngSel++
+            }
+            switch(AngSel){
+                case 1,
+                    EGP:egpTextSize(6, "_", vec2(-51, -72), 25, vec2(0,1), vec(255,0,0))
+                     EGP:egpParent(6, 1)
+                    break
+                case 2,
+                    EGP:egpTextSize(6, "_", vec2(-32, -72), 25, vec2(0,1), vec(0,255,0))
+                     EGP:egpParent(6, 1)
+                    break
+                case 3,
+                    EGP:egpTextSize(6, "_", vec2(-13, -72), 25, vec2(0,1), vec(0,0,255))
+                     EGP:egpParent(6, 1)
+                    break
+            }
+            update()
+        }
+        if(Key == "mouse_left"){
+            propSpawn("models/military/"+Type+".mdl", holoPos(1), holoAng(1), 1)
+        }
+    }
+    timer("delay", 0.1, function(){
+        Delay = 0
+    })
+}
