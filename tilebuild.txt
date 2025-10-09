@@ -7,6 +7,17 @@
 #wirelink_handshake
 #egp_lib
 #if you do not have these, install them from my (Oyerk's) github.
+
+
+#[
+    CONTROLS:
+    Change placing type: R
+    Rotate: Num 4/Num 6
+    Change rotation axis: Num 5
+    Change object type: Left/Right arrow keys
+]#
+
+
 function vector oyerkRound(Input:vector, Divisor:number){
     return vec(round(Input:x()/Divisor)*Divisor,
                round(Input:y()/Divisor)*Divisor,
