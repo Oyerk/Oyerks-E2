@@ -38,6 +38,10 @@
     XWL:egpLineColor(N, XV2, XV2, V)
     Number Index, Vector2 Pos 1, Vector2 Pos 2, Vector Color
     Creates a colored egpLine.
+    
+    XWL:egpRoundedBoxColor(N, XV2, XV2, V)
+    Number Index, Vector2 Pos, Vector2 Size, Vector Color
+    Creates a colored egpRoundedBox.
 ]#
 
 function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:number, Color:vector ){
@@ -91,6 +95,11 @@ function wirelink:egpBoxColor( Index:number, Pos:vector2, Size:vector2, Color:ve
     This:egpColor( Index, Color )
 }
 
+function wirelink:egpBoxColor( Index:number, Pos:vector2, Size:vector2, Color:vector4 ){
+    This:egpBox( Index, Pos, Size )
+    This:egpColor( Index, Color )
+}
+
 function wirelink:egpBoxOutlineColor( Index:number, Pos:vector2, Size:vector2, Color:vector ){
     This:egpBoxOutline( Index, Pos, Size )
     This:egpColor( Index, Color )
@@ -131,4 +140,25 @@ function wirelink:egpTouchingCursor( Index:number, EntCursor:entity ){
 function wirelink:egpLineColor( Index:number, Pos1:vector2, Pos2:vector2, Color:vector ){
     This:egpLine( Index, Pos1, Pos2 )
     This:egpColor( Index, Color )
+}
+
+function wirelink:egpCircleColor( Index:number, Pos:vector2, Size:vector2, Color:vector ){
+    This:egpCircle( Index, Pos, Size )
+    This:egpColor( Index, Color )
+}
+
+function wirelink:egpCircleOutlineColor( Index:number, Pos:vector2, Size:vector2, Color:vector ){
+    This:egpCircleOutline( Index, Pos, Size )
+    This:egpColor( Index, Color )
+}
+
+function wirelink:egpRoundedBoxColor( Index:number, Pos:vector2, Size:vector2, Color:vector ){
+    This:egpRoundedBox( Index, Pos, Size )
+    This:egpColor( Index, Color )
+}
+
+function vec(A:number, B:number){
+    #this isnt meant to be useful, its just a shorthand when you fuck up making a vector2 lol
+    print("Mistype detected.\nYou typed vec(N,N) instead of vec2(N,N).")
+    return vec2(A, B)
 }

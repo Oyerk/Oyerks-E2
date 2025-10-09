@@ -1,0 +1,6 @@
+@name EGP Console Screen Library
+
+function wirelink:egpConsoleText( Line:number, Text:string, Color:vector ) {
+    This:egpText( Line, Text, vec2( 0, Line*14-14 ) )
+    This:egpColor( Line, Color)
+}

@@ -1,0 +1,24 @@
+@name Wirelink Handshake
+#DO NOT USE CHIP STANDALONE; USE AS AN INCLUDE
+
+#in initXWL(), feed it the E2 entity you wanna initate with, alongside the class to look for (ex. gmod_wire_egp for an EGP screen).
+function entity:initXWL(Class:string){
+    findIncludePlayerProps(owner())
+    findByClass(Class)
+    local Ent = findClosest(This:pos())
+    local XWL = Ent:createWirelink()
+    if(!Ent:isValid()){
+        print("No entity to attach Wirelink to!\n No Wirelink established.")
+    }elseif(XWL == nowirelink()){
+        print("Wirelink invalid!\nNo Wirelink established.")
+    }else{
+        
+    }
+    if(XWL:entity():getClass():find("gmod_wire_egp")){
+        XWL:egpClear()
+        if(XWL:entity():getClass():find("gmod_wire_egp_hud")){
+            XWL:egpHudEnable(1)
+        }
+    }
+    return XWL
+}
