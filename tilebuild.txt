@@ -10,6 +10,7 @@
 
 
 #[
+    Switch to the hands swep to use this!
     CONTROLS:
     Change placing type: R
     Rotate: Num 4/Num 6
@@ -26,6 +27,7 @@ function vector oyerkRound(Input:vector, Divisor:number){
 }
 
 if(first()){
+    hint("Take out the hands swep to use!", 5)
     #include "oyerk_libs/wirelink_handshake"
     #include "oyerk_libs/egp_lib"
     EGP = entity():initXWL("gmod_wire_egp_hud")
