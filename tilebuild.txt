@@ -1,7 +1,7 @@
 @name Tilebuild
 @persist EGP:wirelink ScreenSize:vector2 [Platforms Walls]:array
-@persist Type:string Rotation:angle Placing:string I Delay 
-@outputs Rotation:angle AngSel
+@persist Type:string Rotation:angle Placing:string I Delay Offset:vector
+@outputs Offset:vector
 #made by Oyerk
 #this chip requires the following libraries to work:
 #wirelink_handshake
@@ -15,6 +15,8 @@
     Change placing type: R
     Rotate: Up/Down arrow keys
     Change object type: Left/Right arrow keys
+    Place prop: LMB
+    Set offset: RMB
 ]#
 
 
@@ -48,6 +50,7 @@ if(first()){
     )
     Placing = "Platform"
     Rotation = ang(0)
+    Offset = vec(0)
     I = 1
     Delay = 0
     Type = Platforms[1, string]
@@ -82,9 +85,9 @@ function update(){
 
 timer("loop", 0.1, 0, function(){
     if(Placing == "Platform"){
-        holoPos(1, oyerkRound(owner():aimPos(), 32)+vec(64,64,0))
+        holoPos(1, oyerkRound(owner():aimPos(), 32)+vec(64,64,0)+Offset)
     }else{
-        holoPos(1, oyerkRound(owner():aimPos(), 32)+vec(0,0,64))
+        holoPos(1, oyerkRound(owner():aimPos(), 32)+vec(0,0,64)+Offset)
     }
     if(owner():weapon():getClass()=="none"){
         holoAlpha(1, 150)
@@ -157,6 +160,17 @@ event keyPressed(Player:entity, Key:string, Down:number, KeyBind:string) {
 
         if(Key == "mouse_left"){
             propSpawn("models/military/"+Type+".mdl", holoPos(1), holoAng(1), 1)
+        }
+        if(Key == "mouse_right"){
+            local OffsetProp = owner():aimEntity()
+            if(!OffsetProp:isValid()){
+                Offset = vec(0)
+                print("Offset reset")
+            }else{
+                local OffPos = oyerkRound(OffsetProp:pos(), 128)
+                Offset = OffsetProp:pos()-OffPos
+                print("Offset set at "+Offset)
+            }
         }
     }
     timer("delay", 0.1, function(){
