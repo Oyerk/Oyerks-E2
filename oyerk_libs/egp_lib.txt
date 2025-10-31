@@ -7,6 +7,10 @@
     Number Index, String Text, Vector2 Pos, Number Size, Vector Color
     Create a colored and sized egpText object.
 
+    XWL:egpTextSize(N, S, XV2, N, XV2, V)
+    Number Index, String Text, Vector2 Pos, Number Size, Vector2 alignment, Vector Color
+    Create a colored and sized egpText object with alignment (0-2 for each, 0 - left/top, 1 - center, 2 - right/bottom)
+
     XWL:egpTextColor(N, S, XV2, N, V)
     Number Index, String Text, Vector2 Pos, Vector Color
     Creates a colored egpText object.
@@ -42,6 +46,10 @@
     XWL:egpRoundedBoxColor(N, XV2, XV2, V)
     Number Index, Vector2 Pos, Vector2 Size, Vector Color
     Creates a colored egpRoundedBox.
+
+    XWL:egp3DTracker(N, E)
+    Number Index, Entity Parent
+    Creates a 3D tracker that parents to the entity specified.
 ]#
 
 function wirelink:egpTextSize( Index:number, Text:string, Pos:vector2, Size:number, Color:vector ){
@@ -157,8 +165,17 @@ function wirelink:egpRoundedBoxColor( Index:number, Pos:vector2, Size:vector2, C
     This:egpColor( Index, Color )
 }
 
+function wirelink:egpRoundedBoxColor( Index:number, Pos:vector2, Size:vector2, Color:vector4 ){
+    This:egpRoundedBox( Index, Pos, Size )
+    This:egpColor( Index, Color )
+}
 function vec(A:number, B:number){
     #this isnt meant to be useful, its just a shorthand when you fuck up making a vector2 lol
     print("Mistype detected.\nYou typed vec(N,N) instead of vec2(N,N).")
     return vec2(A, B)
+}
+
+function wirelink:egp3DTracker( Index:number, Entity:entity ){
+    This:egp3DTracker(Index, vec(0))
+    This:egpParent(Index, Entity)
 }
